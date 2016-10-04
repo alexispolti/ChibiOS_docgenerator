@@ -790,8 +790,6 @@ INPUT                  = ./src \
                          ../../os/hal/dox \
                          ../../os/hal/src \
                          ../../os/hal/include \
-                         ../../os/hal/templates \
-                         ../../os/hal/templates\osal \
                          $(INPUT)
 
 # This tag can be used to specify the character encoding of the source files

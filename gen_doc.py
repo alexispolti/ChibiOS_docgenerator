@@ -100,7 +100,8 @@ def generate_doxyfile_html(files):
     with open("Doxyfile_html", "w") as f:
         f.write(content)
 
-
+    print("Doxyfile_html generated.")
+    print("You can now run rm -rf html && doxygen Doxyfile_html or follow the instructions in readme.txt")
 
 def usage():
     """
