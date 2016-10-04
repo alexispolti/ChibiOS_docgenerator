@@ -28,7 +28,7 @@ Installation and usage
 - put  ```gen_doc.py``` and ```Doxyfile_html.template``` in ```$(CHIBIOS)/doc/hal```.
 - run  ```python3 gen_doc.py Makefile```, passing as argument the full path to the Makefile of your project.
 
-Your ```Makefile``` is parsed, the correct platform is extracted from it and a proper ```Doxyfile_html``` is generated. 
+Your ```Makefile``` is parsed, the correct platform is extracted from it and a proper ```Doxyfile_html``` is generated.
 You can now either run ```doxygen Doxyfile_html``` or follow the instructions in ```readme.txt```
 
 Caveat
@@ -38,4 +38,4 @@ This tools is still crude, and assume that:
 
 - your Makefile contains one and only one line specifying where ChibiOS is located as in the demos: ```CHIBIOS = ...```. It accepts some variations, such as ```CHIBIOS := ...``` and ```CHIBIOS ?= ...```
 - your Makefile contains one and only one line specifying your platform of the form ```include $(CHIBIOS)/os/hal/ports/STM32/STM32F4xx/platform.mk```
-
+- this tool doesn't accept (yet) spaces in your project / ChibiOS installation path.
