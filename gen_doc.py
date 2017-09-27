@@ -57,6 +57,16 @@ def parse_makefile(filename):
     platform = os.path.abspath(replace_CHIBIOS(CHIBIOS, platform))
     return CHIBIOS, platform
 
+def filter_out_fallback(files):
+    """
+    Given a list of files found in an .mk file, if there are a real LLD port and a fallback one,
+    then filter out the fallbacks.
+    """
+    not_fb = list(filter(lambda l: l.find("fallback") == -1, files))
+    if len(not_fb) != 0:
+        return not_fb
+    return files
+
 def parse_platform(chibios_path, platform_filename):
     """
     Parse platform.mk file, and find every occurence of C and headers files.
@@ -67,23 +77,34 @@ def parse_platform(chibios_path, platform_filename):
     # Look for all occurrence of $(CHIBIOS)...*.c
     exp = "(\$(?:\(CHIBIOS\)|{CHIBIOS})\/[\/\w]*\.c)"
     C_files = re.findall(exp, content, re.M)
+    C_files = filter_out_fallback(C_files)
 
     # Look for all occurrence of $(CHIBIOS)...*.h
     exp = "(\$(?:\(CHIBIOS\)|{CHIBIOS})\/[\/\w]*\.h)"
     H_files = re.findall(exp, content, re.M)
+    H_files = filter_out_fallback(H_files)
 
     # Look for all occurrence of $(CHIBIOS)...*.s
     exp = "(\$(?:\(CHIBIOS\)|{CHIBIOS})\/[\/\w]*\.s)"
     S_files = re.findall(exp, content, re.M)
+    S_files = filter_out_fallback(S_files)
 
     # Look for include directories
     exp = "(\$(?:\(CHIBIOS\)|{CHIBIOS})\/[\/\w]*)[\s|\n]"
     dir_files = re.findall(exp, content, re.M)
+    dir_files = filter_out_fallback(dir_files)
 
     files = []
     for f in C_files + H_files + S_files + dir_files:
         files.append(replace_CHIBIOS(chibios_path, f))
 
+    # Look for all *.mk files and recursively parse them
+    exp = "(\$(?:\(CHIBIOS\)|{CHIBIOS})\/[\/\w]*\.mk)"
+    mk_files = re.findall(exp, content, re.M)
+    for mk_file in mk_files:
+        f = parse_platform(chibios_path, replace_CHIBIOS(chibios_path, mk_file))
+        files += filter_out_fallback(f)
+        
     return files
 
 def generate_doxyfile_html(files):
