@@ -25,7 +25,7 @@ The 4.x branch of ChibiOS contains only the main HAL's documentation: the docume
 Installation and usage
 -----------------------------
 
-- put  ```gen_doc.py``` and ```Doxyfile_html.template``` in ```$(CHIBIOS)/doc/hal```.
+- put  ```gen_doc.py``` in ```$(CHIBIOS)/doc/hal```.
 - run  ```python3 gen_doc.py Makefile```, passing as argument the full path to the Makefile of your project.
 
 Your ```Makefile``` is parsed, the correct platform is extracted from it and a proper ```Doxyfile_html``` is generated.

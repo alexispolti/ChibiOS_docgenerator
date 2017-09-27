@@ -4,7 +4,7 @@
 import sys
 import os
 import re
-
+import itertools
 
 def replace_CHIBIOS(chibios_path, filename):
     """
@@ -65,19 +65,19 @@ def parse_platform(chibios_path, platform_filename):
         content = f.read()
 
     # Look for all occurrence of $(CHIBIOS)...*.c
-    exp = "(\$(?:\(CHIBIOS\)|{CHIBIOS})\/[\/\w\s]*\.c)"
+    exp = "(\$(?:\(CHIBIOS\)|{CHIBIOS})\/[\/\w]*\.c)"
     C_files = re.findall(exp, content, re.M)
 
     # Look for all occurrence of $(CHIBIOS)...*.h
-    exp = "(\$(?:\(CHIBIOS\)|{CHIBIOS})\/[\/\w\s]*\.h)"
+    exp = "(\$(?:\(CHIBIOS\)|{CHIBIOS})\/[\/\w]*\.h)"
     H_files = re.findall(exp, content, re.M)
 
     # Look for all occurrence of $(CHIBIOS)...*.s
-    exp = "(\$(?:\(CHIBIOS\)|{CHIBIOS})\/[\/\w\s]*\.s)"
+    exp = "(\$(?:\(CHIBIOS\)|{CHIBIOS})\/[\/\w]*\.s)"
     S_files = re.findall(exp, content, re.M)
 
     # Look for include directories
-    exp = "(\$(?:\(CHIBIOS\)|{CHIBIOS})\/[\/\w\s]*)[\s|\n]"
+    exp = "(\$(?:\(CHIBIOS\)|{CHIBIOS})\/[\/\w]*)[\s|\n]"
     dir_files = re.findall(exp, content, re.M)
 
     files = []
@@ -88,17 +88,30 @@ def parse_platform(chibios_path, platform_filename):
 
 def generate_doxyfile_html(files):
     """
-    Take the Doxyfile_html template, and replace $(INPUT)
+    Take the Doxyfile_html and replace INPUT tag
     with the list of files / directory to be parsed.
+    Automatically add some key directories.
     """
-    with open("Doxyfile_html.template", "r") as f:
-        content = f.read()
+    # Add some mandatory files
+    files += ["./src",
+                 "../../os/hal/dox",
+                 "../../os/hal/src",
+                 "../../os/hal/include",
+                 "../../os/hal/lib/peripherals/flash",
+                 "../../os/hal/lib/peripherals/sensors"]
 
-    file_list = " \\\n                         ".join(files)
-    content = content.replace("$(INPUT)",file_list)
+    # Now parse Doxyfile_html and modify INPUT tag
+    with open("Doxyfile_html", "r") as f:
+        content = f.readlines()
+
+    prefix = list(itertools.takewhile(lambda l:not l.startswith("INPUT"), content))
+    suffix = list(itertools.dropwhile(lambda l:not re.match(r"^\s*$", l), content[len(prefix)+1:]))
+    line = "INPUT                  = "
+    line += " \\\n                         ".join(files) + "\n"
+    middle = [line]
 
     with open("Doxyfile_html", "w") as f:
-        f.write(content)
+        f.write("".join(prefix + middle + suffix))
 
     print("Doxyfile_html generated.")
     print("You can now run rm -rf html && doxygen Doxyfile_html or follow the instructions in readme.txt")
@@ -108,7 +121,7 @@ def usage():
     Print a helper message.
     """
     print("Usage:", sys.argv[0], "path_to_your_main_Makefile")
-    print("This utility parses the main Makefile of your project, extract the", \
+    print("This utility parses the main Makefile of your project, extracts the", \
     "correct platform, parses it and generate a Doxyfile_html allowing you", \
     "to generate the ChibiOS documentation specific to your processor.")
 
