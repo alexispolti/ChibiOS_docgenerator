@@ -1,7 +1,7 @@
 ChibiOS_docgenerator
 =========
 
-A tool to generate the full ChibiOS 4.x HAL documentation for your processor.
+A tool to generate the full ChibiOS 4.x and 5.x HAL documentation for your processor.
 
 Copyright 2016 Alexis Polti
 
@@ -20,7 +20,7 @@ Python3 (sorry, didn't have time to port it on Python2).
 Goal
 ------
 
-The 4.x branch of ChibiOS contains only the main HAL's documentation: the documentation of the ports have been supressed, as they are quite difficult to generate. Here's a tool to generate this documentation.
+The 4.x and 5.x branches of ChibiOS contain only the main HAL's documentation: the documentation of the ports have been supressed, as they are quite difficult to generate. Here's a tool to generate this documentation.
 
 Installation and usage
 -----------------------------
