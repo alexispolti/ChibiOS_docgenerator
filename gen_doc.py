@@ -31,25 +31,25 @@ def parse_makefile(filename):
     # Check that there is only one occurrence of platform.mk
     if len(res) == 0:
         print("Error : no platform.mk defined in your Makefile.")
-        os.exit(-1)
+        sys.exit(-1)
     if len(res) > 1:
         print("Error : multiple platform.mk defined in your Makefile")
-        os.exit(-1)
+        sys.exit(-1)
     platform = res[0]
 
     # Look for "CHIBIOS = ..."$
-    exp = "^CHIBIOS[:\?\s]=\s?(.*)"
+    exp = "^CHIBIOS\s*[:\?]?=\s*(.*)"
     res = re.findall(exp, content, re.M)
 
     # Check that there is only one occurrence of CHIBIOS definition
     if len(res) == 0:
         print("Error : path to CHIBIOS is not defined in your Makefile.")
-        os.exit(-1)
+        sys.exit(-1)
     if len(res) > 1:
         print("Error : multiple definition of CHIBIOS path defined in your Makefile:")
         for r in res:
             print(r, )
-        os.exit(-1)
+        sys.exit(-1)
     CHIBIOS = res[0]
 
     # Purify CHIBIOS and platform.mk path
@@ -152,7 +152,7 @@ def main():
     # Check that the Makefile is passed as argument.
     if len(sys.argv) != 2:
         usage()
-        exit(-1)
+        sys.exit(-1)
 
     # Parse Makefile
     CHIBIOS, platform = parse_makefile(sys.argv[1])
