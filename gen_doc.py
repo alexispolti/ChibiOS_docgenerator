@@ -38,7 +38,7 @@ def parse_makefile(filename):
     platform = res[0]
 
     # Look for "CHIBIOS = ..."$
-    exp = "^CHIBIOS[:\?\s]=\s?(.*)"
+    exp = "^CHIBIOS\s*[:\?]?=\s*(.*)"
     res = re.findall(exp, content, re.M)
 
     # Check that there is only one occurrence of CHIBIOS definition
