@@ -62,7 +62,7 @@ def filter_out_fallback(files):
     Given a list of files found in an .mk file, if there are a real LLD port and a fallback one,
     then filter out the fallbacks.
     """
-    return [l for l in files if l.find("fallback") == -1] or files
+    return [l.strip() for l in files if l.find("fallback") == -1] or files
 
 def parse_platform(chibios_path, platform_filename):
     """
@@ -71,32 +71,13 @@ def parse_platform(chibios_path, platform_filename):
     with open(platform_filename, "r") as f:
         content = f.read()
 
-    # Look for all occurrence of $(CHIBIOS)...*.c
-    exp = "(\$(?:\(CHIBIOS\)|{CHIBIOS})\/[\/\w]*\.c)"
-    C_files = re.findall(exp, content, re.M)
-    C_files = filter_out_fallback(C_files)
-
-    # Look for all occurrence of $(CHIBIOS)...*.h
-    exp = "(\$(?:\(CHIBIOS\)|{CHIBIOS})\/[\/\w]*\.h)"
-    H_files = re.findall(exp, content, re.M)
-    H_files = filter_out_fallback(H_files)
-
-    # Look for all occurrence of $(CHIBIOS)...*.s
-    exp = "(\$(?:\(CHIBIOS\)|{CHIBIOS})\/[\/\w]*\.s)"
-    S_files = re.findall(exp, content, re.M)
-    S_files = filter_out_fallback(S_files)
-
-    # Look for include directories
-    exp = "(\$(?:\(CHIBIOS\)|{CHIBIOS})\/[\/\w]*)[\s|\n]"
-    dir_files = re.findall(exp, content, re.M)
-    dir_files = filter_out_fallback(dir_files)
-
-    files = []
-    for f in C_files + H_files + S_files + dir_files:
-        files.append(replace_CHIBIOS(chibios_path, f))
+    # Look for all occurrence of $(CHIBIOS)...*.[chs] and includes
+    exp = r"(\$(?:\(CHIBIOS\)|{CHIBIOS})\/[\/\w]*(\.[chs]|\s|\n))"
+    files = [f[0] for f in re.findall(exp, content, re.M)]
+    files = [replace_CHIBIOS(chibios_path, f) for f in filter_out_fallback(files)]
 
     # Look for all *.mk files and recursively parse them
-    exp = "(\$(?:\(CHIBIOS\)|{CHIBIOS})\/[\/\w]*\.mk)"
+    exp = r"(\$(?:\(CHIBIOS\)|{CHIBIOS})\/[\/\w]*\.mk)"
     mk_files = re.findall(exp, content, re.M)
     for mk_file in mk_files:
         f = parse_platform(chibios_path, replace_CHIBIOS(chibios_path, mk_file))
