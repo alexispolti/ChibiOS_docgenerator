@@ -62,10 +62,7 @@ def filter_out_fallback(files):
     Given a list of files found in an .mk file, if there are a real LLD port and a fallback one,
     then filter out the fallbacks.
     """
-    not_fb = list(filter(lambda l: l.find("fallback") == -1, files))
-    if len(not_fb) != 0:
-        return not_fb
-    return files
+    return [l for l in files if l.find("fallback") == -1] or files
 
 def parse_platform(chibios_path, platform_filename):
     """
